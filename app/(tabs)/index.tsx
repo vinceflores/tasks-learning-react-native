@@ -1,70 +1,70 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { useEffect, useState } from "react";
+import { TextInput, View, Text, Button, Pressable } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function Todo() {
+  const [input, setInput] = useState("");
+  const [todo, setTodo] = useState<string[]>([]);
+  function addTodo() {
+    if (input !== "") {
+      setTodo((prev) => [...prev, input]);
+      setInput("");
+    }
+  }
 
-export default function HomeScreen() {
+  function deleteDoto(index: number) {
+    setTodo((prev) => prev.filter((_, i) => i !== index));
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View className="bg-black h-screen flex flex-col justify-start p-4 items-start">
+      <View className=" mt-12 w-full ">
+        <View className="flex flex-row justify-between items-center">
+          <Text className="text-white text-4xl">Tasks</Text>
+          <Text className="text-white text-xl">{input.length}</Text>
+        </View>
+        <TextInput
+          value={input}
+          onChangeText={setInput}
+          className="bg-slate-900 mt-4  p-4 text-white rounded-lg "
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+      <Pressable
+        onPress={addTodo}
+        className="border border-white p-2 rounded-lg mt-4 w-full items-center"
+      >
+        <Text className="text-white text-lg">Add Todo</Text>
+      </Pressable>
+      <View className="w-full my-4 ">
+        {todo?.map((item, index) => (
+          <TodoItem
+            key={index}
+            index={index}
+            todo={item}
+            deleteTodo={deleteDoto}
+          />
+        ))}
+      </View>
+    </View>
   );
 }
+type TodoProps = {
+  todo: string;
+  index: number;
+  deleteTodo: (index: number) => void;
+};
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+const TodoItem = ({ todo, deleteTodo, index }: TodoProps) => {
+  function del() {
+    deleteTodo(index);
+  }
+
+  return (
+    <View className="my-2  border border-gray-700 w-full flex flex-row justify-between rounded-lg text-3xl p-2 text-blue-500">
+      {/* <Text className="text-blue-500">{index + 1}</Text> */}
+      <Text className="text-blue-500">{todo}</Text>
+      <Pressable onPress={del} className="flex flex-row space-x-2">
+        <Text className="text-red-500">X</Text>
+      </Pressable>
+    </View>
+  );
+};
